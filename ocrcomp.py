@@ -60,5 +60,5 @@ def ocrcomp(path,*args):
 if __name__ == "__main__":
 	#print ocr1("images/img11.jpg")
 
-	#print ocrcomp("images/img6.jpg",ocr0,ocr2)
+	print ocrcomp("images/img6.jpg",ocr0,ocr2)
 
