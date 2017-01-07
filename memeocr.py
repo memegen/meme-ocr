@@ -4,7 +4,7 @@ import time
 import random
 import json
 
-path = "images/img6.jpg"
+path = "images/img8.jpg"
 
 # characters to recognize
 C = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789"
@@ -13,22 +13,40 @@ C = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789"
 cimgs = []
 
 # original image
-IM = Image.open(path)
-w, h = IM.size
-PX = IM.load()
+IM = None
+w, h = 0,0
+PX = None
 
 # display layer
-disp = Image.new("RGB",(w,h))
-draw = ImageDraw.Draw(disp)
+disp = None
+draw = None
 
 # threshold layer
-thim = Image.new("RGB",(w,h))
-thpx = thim.load()
-thdr = ImageDraw.Draw(thim)
+thim = None
+thpx = None
+thdr = None
 
 # character areas
 areas = []
 badareas = []
+
+
+def loadimg(path):
+	global IM,w,h,PX,disp,draw,thim,thpx,thdr
+	# original image
+	IM = Image.open(path)
+	w, h = IM.size
+	PX = IM.load()
+
+	# display layer
+	disp = Image.new("RGB",(w,h))
+	draw = ImageDraw.Draw(disp)
+
+	# threshold layer
+	thim = Image.new("RGB",(w,h))
+	thpx = thim.load()
+	thdr = ImageDraw.Draw(thim)	
+
 
 # rgb(255,255,255) to hsv(360,1.0,1.0) conversion
 def rgb2hsv(r,g,b):
@@ -97,10 +115,10 @@ def flood(x,y,d):
 
 # get all character areas
 def getareas():
-	for y in list(range(0,h/3,5))+list(range(2*h/3,h,5)):
+	for y in list(range(0,h/4,10))+list(range(3*h/4,h,10)):
 		print y, "/", h
-		for x in range(0,w,2):
-			area = flood(x,y,10000)
+		for x in range(0,w,5):
+			area = flood(x,y,30000)
 			#print area
 			if len(area) > 1:
 				col = (random.randrange(0,255),random.randrange(0,255),random.randrange(0,255))
@@ -174,7 +192,7 @@ def normalize(scores):
 		if scores[i][1] <= 0 or scores[0][1] == 0:
 			ns[i] = (scores[i][0],0)
 		else:
-			n = (scores[i][1])/scores[0][1]
+			n = (scores[i][1]*1.0)/scores[0][1]
 			ns[i] = (scores[i][0],int(n*1000)/1000.0)
 
 	return ns
@@ -185,47 +203,52 @@ def showresult(scoreboard):
 		print "".join([s[0] for s in scoreboard[i]])
 
 # make character glyphs
-for i in range(0,len(C)):
-	im = Image.new("RGB",(100,110))
-	dr = ImageDraw.Draw(im)
-	font = ImageFont.truetype("Impact", 124)
-	dr.text((0, -25),C[i],(255,255,255),font=font)
+def makeglyphs():
+	for i in range(0,len(C)):
+		im = Image.new("RGB",(100,110))
+		dr = ImageDraw.Draw(im)
+		font = ImageFont.truetype("Impact", 124)
+		dr.text((0, -25),C[i],(255,255,255),font=font)
 
-	fwx = firstwhitex(im)
+		fwx = firstwhitex(im)
 
-	im = Image.new("RGB",(100,110))
-	dr = ImageDraw.Draw(im)
-	font = ImageFont.truetype("Impact", 124)
-	dr.text((-fwx, -26),C[i],(255,255,255),font=font)
+		im = Image.new("RGB",(100,110))
+		dr = ImageDraw.Draw(im)
+		font = ImageFont.truetype("Impact", 124)
+		dr.text((-fwx, -26),C[i],(255,255,255),font=font)
 
-	cimgs.append(im)
+		cimgs.append(im)
 
 # make threshold image
-for x in range(0,w):
-	for y in range(0,h):
-		r, g, b = PX[x,y][:3]
-		hsv = rgb2hsv(r,g,b)
-		if hsv[2] > 0.9 and hsv[1] < 0.1:
-			thdr.point([x,y],fill=(255,255,255))
-		else:
-			thdr.point([x,y],fill=(0,0,0))
+def thresh():
+	for x in range(0,w):
+		for y in range(0,h):
+			r, g, b = PX[x,y][:3]
+			hsv = rgb2hsv(r,g,b)
+			if (hsv[2] > 0.9)and hsv[1] < 0.1:
+				thdr.point([x,y],fill=(255,255,255))
+			else:
+				thdr.point([x,y],fill=(0,0,0))
+
+# returns possible characters and bounds in an image
+def rawocr(path):
+	loadimg(path)
+	makeglyphs()
+	thresh()
+	thim.show()
+	getareas()
+	bds = drawbounds()
+	disp.show()
+	ccr = checkchars()
+	showresult(ccr)
+	disp.show()	
+	return bds, ccr
 
 
+if __name__ == "__main__":
+	bds,ccr = rawocr(path)
 
-thim.show()
-getareas()
-
-bds = drawbounds()
-
-disp.show()
-
-ccr = checkchars()
-
-showresult(ccr)
-
-disp.show()
-
-js = json.dumps([bds,ccr])
-fo = open("data/"+path.split("/")[-1].split(".")[0]+".json","w")
-fo.write(js)
+	js = json.dumps([bds,ccr])
+	fo = open("data/"+path.split("/")[-1].split(".")[0]+".json","w")
+	fo.write(js)
 
