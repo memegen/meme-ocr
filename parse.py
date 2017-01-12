@@ -1,5 +1,9 @@
+from __future__ import print_function
+from __future__ import division
 #pylint: disable=C0103
 
+from builtins import range
+from past.utils import old_div
 import json
 import itertools
 import util
@@ -25,7 +29,7 @@ def guessformat():
         found = 0
         for j in range(0, len(lines)):
             if len(lines[j]) > 0:
-                if abs(bds[i][1] - sum([bds[l][1] for l in lines[j]]) / len(lines[j])) < 5:
+                if abs(bds[i][1] - old_div(sum([bds[l][1] for l in lines[j]]), len(lines[j]))) < 5:
                     lines[j].append(i)
                     found = 1
                     break
@@ -119,11 +123,11 @@ def guessword(w, simple=False):
         if len(pot) == 0 or pot[-1][1][1] < 0.8:
             return guess0
         nc = pot.pop()
-        if nc[0] not in changes.keys():
+        if nc[0] not in list(changes.keys()):
             changes[nc[0]] = []
         changes[nc[0]].append(nc)
 
-        chco = util.allchoice(changes.values())
+        chco = util.allchoice(list(changes.values()))
 
         for c in chco:
             newword = word[:]
@@ -146,7 +150,7 @@ def isgibber(t):
         return True
     if len(t) < 4 and " " in t:
         return True
-    if t.count(" ") > len(t) / 3:
+    if t.count(" ") > old_div(len(t), 3):
         return True
 
     return False
@@ -158,10 +162,10 @@ def guesscaption(simple=False):
     output = ""
     gf = guessformat()
 
-    print "raw: "
+    print("raw: ")
     for g in gf:
-        print guessline(g, True)
-    print
+        print(guessline(g, True))
+    print()
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -173,4 +177,4 @@ def guesscaption(simple=False):
     return output
 
 if __name__ == "__main__":
-    print guesscaption()
+    print(guesscaption())

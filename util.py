@@ -1,5 +1,6 @@
 #pylint: disable=C0103
 
+from builtins import range
 def allchoice(L):
     pool = [[]]
     for i in range(0, len(L)):

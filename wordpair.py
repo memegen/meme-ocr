@@ -1,7 +1,11 @@
+from __future__ import print_function
+from __future__ import division
 # pylint: disable=C0103
 # pair letters in words with similar spelling
 
 
+from builtins import range
+from past.utils import old_div
 def wordpair(w1, w2):
     result = []
     l = min(len(w1), len(w2))
@@ -52,22 +56,22 @@ def printwordpair(wp):
 
 
 def testwordpair(f):
-    print f(wordpair("president", "precedent"))
-    print f(wordpair("affection", "affectation"))
-    print f(wordpair("eminent", "immanent"))
-    print f(wordpair("principal", "principle"))
-    print f(wordpair("desert", "dessert"))
-    print f(wordpair("deed", "indeed"))
-    print f(wordpair("immense", "intense"))
-    print f(wordpair("drastic", "dramatic"))
-    print f(wordpair("emulsion", "emotion"))
-    print f(wordpair("wikipedia", "vvil<ieolix"))
+    print(f(wordpair("president", "precedent")))
+    print(f(wordpair("affection", "affectation")))
+    print(f(wordpair("eminent", "immanent")))
+    print(f(wordpair("principal", "principle")))
+    print(f(wordpair("desert", "dessert")))
+    print(f(wordpair("deed", "indeed")))
+    print(f(wordpair("immense", "intense")))
+    print(f(wordpair("drastic", "dramatic")))
+    print(f(wordpair("emulsion", "emotion")))
+    print(f(wordpair("wikipedia", "vvil<ieolix")))
 
 # similarity of a word pair
 
 
 def wordsim(wp):
-    return sum([w[0] == w[1] for w in wp]) * 1.0 / sum([(len(w[0]) + len(w[1])) / 2.0 for w in wp])
+    return sum([w[0] == w[1] for w in wp]) * 1.0 / sum([old_div((len(w[0]) + len(w[1])), 2.0) for w in wp])
 
 
 if __name__ == "__main__":

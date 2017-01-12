@@ -1,5 +1,7 @@
+from __future__ import print_function
 #pylint: disable=C0103
 
+from builtins import range
 from PIL import Image, ImageDraw, ImageFont
 import memeocr as mo
 import json
@@ -11,7 +13,7 @@ def charsim():
     C = mo.C
 
     for i in range(0, len(cimgs)):
-        print C[i]
+        print(C[i])
         scores = []
         px1 = cimgs[i].load()
         for j in range(0, len(cimgs)):

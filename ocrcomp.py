@@ -1,5 +1,9 @@
+from __future__ import print_function
+from __future__ import division
 #pylint: disable=C0103
 
+from builtins import range
+from past.utils import old_div
 import json
 
 wl = open("dict/linuxwords.txt", "r").read().upper().split("\n")
@@ -57,8 +61,8 @@ def evalresult(t):
     for i in range(0, len(t)):
         if t[i] in wl:
             score += 1.0
-    print score / len(t)
-    return score / len(t)
+    print(old_div(score, len(t)))
+    return old_div(score, len(t))
 
 # sort a list of ocr functions by their quality
 
@@ -72,4 +76,4 @@ def ocrcomp(path, *args):
 if __name__ == "__main__":
     # print ocr1("images/img11.jpg")
 
-    print ocrcomp("images/img6.jpg", ocr0, ocr2)
+    print(ocrcomp("images/img6.jpg", ocr0, ocr2))

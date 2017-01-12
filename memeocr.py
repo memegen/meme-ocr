@@ -1,5 +1,9 @@
+from __future__ import print_function
+from __future__ import division
 #pylint: disable=C0103
 
+from builtins import range
+from past.utils import old_div
 import sys
 import time
 import random
@@ -52,9 +56,9 @@ def loadimg(path):
 
 # rgb(255,255,255) to hsv(360,1.0,1.0) conversion
 def rgb2hsv(r, g, b):
-    R = r / 255.0
-    G = g / 255.0
-    B = b / 255.0
+    R = old_div(r, 255.0)
+    G = old_div(g, 255.0)
+    B = old_div(b, 255.0)
     cmax = max(R, G, B)
     cmin = min(R, G, B)
     delta = cmax - cmin
@@ -62,15 +66,15 @@ def rgb2hsv(r, g, b):
     if delta == 0:
         H = 0
     elif cmax == R:
-        H = 60 * (((G - B) / delta) % 6)
+        H = 60 * ((old_div((G - B), delta)) % 6)
     elif cmax == G:
-        H = 60 * ((B - R) / delta + 2)
+        H = 60 * (old_div((B - R), delta) + 2)
     elif cmax == B:
-        H = 60 * ((R - G) / delta + 4)
+        H = 60 * (old_div((R - G), delta) + 4)
     if cmax == 0:
         S = 0
     else:
-        S = delta / cmax
+        S = old_div(delta, cmax)
     V = cmax
     return H, S, V
 
@@ -130,8 +134,8 @@ def flood(x, y, d):
 
 # get all character areas
 def getareas():
-    for y in list(range(0, h / 4, 10)) + list(range(3 * h / 4, h, 10)):
-        print y, "/", h
+    for y in list(range(0, old_div(h, 4), 10)) + list(range(3 * h / 4, h, 10)):
+        print(y, "/", h)
         for x in range(0, w, 5):
             area = flood(x, y, 30000)
             # print area
@@ -177,14 +181,14 @@ def drawbounds():
 def checkchars():
     scoreboard = []
     for i in range(0, len(areas)):
-        print i, "/", len(areas)
+        print(i, "/", len(areas))
         bd = getbounds(areas[i])
         scores = []
         for j in range(0, len(cimgs)):
             score = 0
             px = cimgs[j].load()
             score = 0
-            sc = (1.0 * (bd[3] - bd[1])) / 100.0
+            sc = old_div((1.0 * (bd[3] - bd[1])), 100.0)
             for x in range(0, cimgs[j].size[0]):
                 for y in range(0, cimgs[j].size[1]):
                     xp = min(int(x * sc + bd[0]), w - 1)
@@ -203,7 +207,7 @@ def checkchars():
                             score += 0
                         else:
                             score -= 1
-            scores.append((C[j], int(score * 10) / 10.0))
+            scores.append((C[j], old_div(int(score * 10), 10.0)))
         scoreboard.append(normalize(scores))
         draw.text((bd[0], bd[1] - 5), normalize(scores)[0][0], (0, 255, 255))
     return scoreboard
@@ -220,8 +224,8 @@ def normalize(scores):
         if scores[i][1] <= 0 or scores[0][1] == 0:
             ns[i] = (scores[i][0], 0)
         else:
-            n = (scores[i][1] * 1.0) / scores[0][1]
-            ns[i] = (scores[i][0], int(n * 1000) / 1000.0)
+            n = old_div((scores[i][1] * 1.0), scores[0][1])
+            ns[i] = (scores[i][0], old_div(int(n * 1000), 1000.0))
 
     return ns
 
@@ -230,7 +234,7 @@ def normalize(scores):
 
 def showresult(scoreboard):
     for i in range(0, len(scoreboard)):
-        print "".join([s[0] for s in scoreboard[i]])
+        print("".join([s[0] for s in scoreboard[i]]))
 
 # make character glyphs
 
