@@ -1,3 +1,5 @@
+#pylint: disable=C0103
+
 from PIL import Image, ImageDraw, ImageFont
 import memeocr as mo
 import json

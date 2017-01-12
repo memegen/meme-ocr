@@ -1,4 +1,4 @@
-
+# pylint: disable=C0103
 # pair letters in words with similar spelling
 
 

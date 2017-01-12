@@ -1,3 +1,5 @@
+#pylint: disable=C0103
+
 import json
 
 wl = open("dict/linuxwords.txt", "r").read().upper().split("\n")
