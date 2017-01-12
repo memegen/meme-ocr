@@ -8,6 +8,7 @@ import sys
 import time
 import random
 import json
+import os
 from PIL import Image, ImageDraw, ImageFont
 
 path = "images/img8.jpg"
@@ -134,7 +135,7 @@ def flood(x, y, d):
 
 # get all character areas
 def getareas():
-    for y in list(range(0, old_div(h, 4), 10)) + list(range(3 * h / 4, h, 10)):
+    for y in list(range(0, int(old_div(h, 4)), 10)) + list(range(int(3 * h / 4), h, 10)):
         print(y, "/", h)
         for x in range(0, w, 5):
             area = flood(x, y, 30000)
@@ -240,17 +241,18 @@ def showresult(scoreboard):
 
 
 def makeglyphs():
+
     for i in range(0, len(C)):
         im = Image.new("RGB", (100, 110))
         dr = ImageDraw.Draw(im)
-        font = ImageFont.truetype("Impact", 124)
+        font = ImageFont.truetype("Impact.ttf", 124)
         dr.text((0, -25), C[i], (255, 255, 255), font=font)
 
         fwx = firstwhitex(im)
 
         im = Image.new("RGB", (100, 110))
         dr = ImageDraw.Draw(im)
-        font = ImageFont.truetype("Impact", 124)
+        font = ImageFont.truetype("Impact.ttf", 124)
         dr.text((-fwx, -26), C[i], (255, 255, 255), font=font)
 
         cimgs.append(im)
