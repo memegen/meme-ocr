@@ -1,14 +1,14 @@
 from __future__ import print_function
 from __future__ import division
-#pylint: disable=C0103
 
 from builtins import range
 from past.utils import old_div
-import sys
-import time
 import random
 import json
-import os
+import sys
+import enchant
+import pyocr
+import pyocr.builders
 from PIL import Image, ImageDraw, ImageFont
 
 path = "images/img8.jpg"
@@ -245,14 +245,14 @@ def makeglyphs():
     for i in range(0, len(C)):
         im = Image.new("RGB", (100, 110))
         dr = ImageDraw.Draw(im)
-        font = ImageFont.truetype("Impact.ttf", 124)
+        font = ImageFont.truetype("./fonts/Impact.ttf", 124)
         dr.text((0, -25), C[i], (255, 255, 255), font=font)
 
         fwx = firstwhitex(im)
 
         im = Image.new("RGB", (100, 110))
         dr = ImageDraw.Draw(im)
-        font = ImageFont.truetype("Impact.ttf", 124)
+        font = ImageFont.truetype("./fonts/Impact.ttf", 124)
         dr.text((-fwx, -26), C[i], (255, 255, 255), font=font)
 
         cimgs.append(im)
@@ -285,6 +285,63 @@ def rawocr(path):
     showresult(ccr)
     disp.show()
     return bds, ccr
+
+
+def tesseract_ocr_helper(base_image, config="Default"):
+    """ A wrapper for using tesseract to do OCR
+    """
+    tools = pyocr.get_available_tools()
+    if len(tools) == 0:
+        print("No OCR tool found")
+        sys.exit(1)
+
+    # The tools are returned in the recommended order of usage
+    tool = tools[0]
+    print("Will use tool '%s'" % (tool.get_name()))
+
+    langs = tool.get_available_languages()
+    print("Available languages: %s" % ", ".join(langs))
+    lang = langs[0]
+    print("Will use lang '%s'" % (lang))
+
+    custom_builder = pyocr.builders.TextBuilder()
+    if config != "Default":
+        custom_builder.tesseract_configs = [config]
+
+    txt = tool.image_to_string(
+        base_image,
+        lang=lang,
+        builder=custom_builder
+    )
+
+    # Spell correct
+    d = enchant.DictWithPWL("en_US", "./dict/urban_dict.txt")
+    txtA = txt.replace('\n', ' \n ')
+    A = txtA.split(" ")
+    B = []
+
+    for x in A:
+        if (x != '\n' and len(x) != 0
+                and d.check(x) is False
+                and len(d.suggest(x)) != 0):
+            B.append(d.suggest(x)[0])
+        else:
+            B.append(x)
+
+    return " ".join(B)
+
+
+def tesseract_ocr(path, thres=False, cfg="Default"):
+    """ Wrapper for tesseract OCR
+    """
+    loadimg(path)
+    if thres:
+        thresh()
+        result = tesseract_ocr_helper(thim, config=cfg)
+        return result
+    else:
+        result = tesseract_ocr_helper(IM, config=cfg)
+        return result
 
 
 if __name__ == "__main__":

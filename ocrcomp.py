@@ -1,7 +1,5 @@
 from __future__ import print_function
 from __future__ import division
-#pylint: disable=C0103
-
 from builtins import range
 from past.utils import old_div
 import json
@@ -22,19 +20,19 @@ def ocr0(path):
     parse.ccr = js[1]
     return parse.guesscaption(simple=True)
 
-# diy ocr from scratch
-
 
 def ocr(path):
+    """ DIY OCR from scratch
+    """
     import memeocr as mo
     import parse
     parse.bds, parse.ccr = mo.rawocr(path)
     return parse.guesscaption()
 
-# diy ocr from data
-
 
 def ocr1(path):
+    """ DIY OCR from data
+    """
     import parse
     parse.path = path
     fi = open("data/" + path.split("/")[-1].split(".")[0] + ".json", "r")
@@ -43,11 +41,12 @@ def ocr1(path):
     parse.ccr = js[1]
     return parse.guesscaption()
 
-# mock tesserect result
 
-
-def ocr2(path):
-    return "YO BAWC I HEAR YOU CAN'T USE WIKIDEMIA AS A SOURCE SC | SOURCE THE SOURCES INSIDE OF WIRETAPPER'S SOURCES"
+def ocrTesseract(path, thres=True, cfg="urban"):
+    """ Tesseract OCR
+    """
+    import memeocr as mo
+    return mo.tesseract_ocr(path, thres=thres, cfg=cfg)
 
 
 # evaluate the quality of an ocr result
@@ -64,10 +63,9 @@ def evalresult(t):
     print(old_div(score, len(t)))
     return old_div(score, len(t))
 
-# sort a list of ocr functions by their quality
-
-
 def ocrcomp(path, *args):
+    """ Sort a list of ocr functions by their quality
+    """
     results = []
     for f in args:
         results.append((f, f(path)))
@@ -76,4 +74,4 @@ def ocrcomp(path, *args):
 if __name__ == "__main__":
     # print ocr1("images/img11.jpg")
 
-    print(ocrcomp("images/img6.jpg", ocr0, ocr2))
+    print(ocrcomp("images/img6.jpg", ocr0, ocrTesseract))
